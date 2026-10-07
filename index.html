@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NutriShelf | Dehydrated Goodness</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#fff9ed;color:#183b2d}
+header{position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid #eadfca}
+.nav{max-width:1150px;margin:auto;padding:14px 22px;display:flex;justify-content:space-between;align-items:center}
+.logo{font-size:28px;font-weight:900;color:#19744e}.logo span{color:#ef8b31}
+.nav button{border:0;border-radius:12px;padding:11px 15px;font-weight:800;cursor:pointer}
+.cart-open{background:#ef8b31;color:#fff}
+.hero,.wrap{max-width:1150px;margin:auto}
+.hero{padding:55px 22px;display:grid;grid-template-columns:1fr 1fr;gap:30px;align-items:center}
+.pill{display:inline-block;background:#dff09a;padding:8px 14px;border-radius:30px;font-weight:800}
+h1{font-size:62px;line-height:.95;margin:18px 0}.green{color:#19744e}
+.hero p{font-size:18px;line-height:1.6;color:#68766f}
+.btn{border:0;border-radius:12px;padding:12px 17px;font-weight:800;cursor:pointer}.btn.green{background:#19744e;color:white}.btn.orange{background:#ef8b31;color:white}
+.hero-art{height:320px;border-radius:35px;background:linear-gradient(135deg,#dff09a,#ffc578);display:flex;align-items:center;justify-content:center;font-size:90px}
+.wrap{padding:35px 22px}.products{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.card{background:#fff;border-radius:20px;overflow:hidden;box-shadow:0 7px 25px #183b2d14}.photo{height:205px;background:#eff7d9;display:flex;align-items:center;justify-content:center;font-size:75px}.photo img{width:100%;height:100%;object-fit:cover}.body{padding:18px}.price{font-size:22px;font-weight:900;color:#19744e}
+.add-cart{width:100%;margin-top:12px;background:#ef8b31;color:#fff;border:0;border-radius:11px;padding:12px;font-weight:800;cursor:pointer}
+.cart-panel{position:fixed;right:0;top:0;width:min(430px,100%);height:100vh;background:#fff;z-index:60;padding:22px;box-shadow:-10px 0 35px #0003;transform:translateX(105%);transition:.25s;overflow:auto}.cart-panel.open{transform:translateX(0)}
+.overlay{display:none;position:fixed;inset:0;background:#0005;z-index:50}.overlay.show{display:block}
+.row{display:flex;justify-content:space-between;align-items:center;gap:10px}.cart-item{padding:14px 0;border-bottom:1px solid #eee}.qty button{border:0;background:#eee7d8;border-radius:8px;padding:6px 10px;font-weight:bold}.total{font-size:24px;font-weight:900;color:#19744e;margin:18px 0}
+.checkout{display:grid;gap:9px}.checkout input,.checkout textarea{width:100%;padding:12px;border:1px solid #ddd;border-radius:10px;font:inherit}.checkout button{border:0;border-radius:10px;padding:12px;font-weight:800;cursor:pointer}.wa{background:#19744e;color:#fff}.upi{background:#ef8b31;color:#fff}
+.settings{background:#183b2d;color:#fff;border-radius:22px;padding:25px;margin-top:25px}.settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.settings input,.settings textarea{width:100%;padding:12px;border:0;border-radius:9px;margin-top:5px;font:inherit}.full{grid-column:1/-1}
+.admin-overlay{display:none;position:fixed;inset:0;background:#0008;z-index:100;overflow:auto;padding:25px}.admin-overlay.show{display:block}
+.admin-box{max-width:900px;margin:30px auto;background:#fff;border-radius:22px;padding:25px}.admin-box input,.admin-box textarea{width:100%;padding:12px;border:1px solid #ddd;border-radius:9px;margin-top:5px;font:inherit}.admin-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.admin-list{margin-top:25px}.admin-product{padding:12px;border:1px solid #eee;border-radius:12px;margin:8px 0;display:flex;justify-content:space-between;align-items:center;gap:10px}
+footer{background:#183b2d;color:#dcebe3;text-align:center;padding:30px;margin-top:45px}
+@media(max-width:780px){.hero{grid-template-columns:1fr}h1{font-size:48px}.products{grid-template-columns:1fr}.admin-grid,.settings-grid{grid-template-columns:1fr}.full{grid-column:auto}}
+</style>
+</head>
+<body>
+
+<header><div class="nav">
+<div class="logo">🥭🍌🍎 Nutri<span>Shelf</span> 🥭🍌🍎</div>
+<button class="cart-open" onclick="openCart()">🛒 Cart (<span id="cartCount">0</span>)</button>
+</div></header>
+
+<section class="hero">
+<div><span class="pill">DEHYDRATED GOODNESS</span><h1>Fresh ideas.<br><span class="green">Dehydrated.</span></h1>
+<p>Delicious dehydrated fruits, vegetables and homemade goodness from NutriShelf.</p>
+<button class="btn green" onclick="document.getElementById('shop').scrollIntoView()">Shop now</button></div>
+<div class="hero-art">🥭 🍌 🍎</div>
+</section>
+
+<section class="wrap" id="shop">
+<h2>Our Products</h2><p style="color:#68766f">Choose your products and add them to your cart.</p>
+<div class="products" id="products"></div>
+</section>
+
+<div class="overlay" id="overlay" onclick="closeCart()"></div>
+<aside class="cart-panel" id="cartPanel">
+<div class="row"><h2>🛒 Your Cart</h2><button onclick="closeCart()">✕</button></div>
+<div id="cartItems"></div>
+<div class="total">Total: ₹<span id="cartTotal">0</span></div>
+<div class="checkout">
+<input id="customerName" placeholder="Your name">
+<input id="customerPhone" placeholder="Your phone number">
+<textarea id="customerAddress" placeholder="Delivery address"></textarea>
+<button class="wa" onclick="whatsappOrder()">📲 Buy Now / WhatsApp Order</button>
+<button class="upi" onclick="upiPay()">💳 Pay with UPI</button>
+<a id="callLink" style="text-align:center;background:#eee7d8;color:#183b2d;padding:12px;border-radius:10px;text-decoration:none;font-weight:800" href="#">☎️ Call NutriShelf</a>
+</div>
+</aside>
+
+<footer>🥭🍌🍎 ©NutriShelf 🥭🍌🍎</footer>
+
+<!-- Hidden admin area. Open with Ctrl + Shift + A -->
+<div class="admin-overlay" id="adminOverlay">
+<div class="admin-box">
+<div class="row"><h2>🔐 NutriShelf Admin</h2><button onclick="closeAdmin()">✕</button></div>
+<div id="loginArea">
+<p>This area is for the store owner only.</p>
+<input id="adminPassword" type="password" placeholder="Admin password">
+<br><br><button class="btn green" onclick="loginAdmin()">Unlock Admin</button>
+<p style="font-size:13px;color:#777">First-time password: <b>NutriShelf123</b>. Change it after logging in.</p>
+</div>
+
+<div id="adminArea" style="display:none">
+<h3>Products</h3>
+<div class="admin-grid">
+<div><label>Product name<input id="aName"></label></div>
+<div><label>Price (₹)<input id="aPrice" type="number" min="0"></label></div>
+<div class="full"><label>Description<textarea id="aDesc"></textarea></label></div>
+<div><label>Emoji<input id="aEmoji" placeholder="🥭"></label></div>
+<div><label>Picture<input id="aImage" type="file" accept="image/*"></label><img id="aPreview" style="display:none;max-width:150px;max-height:100px;margin-top:7px;border-radius:9px"></div>
+<div class="full"><button class="btn orange" onclick="saveProduct()">💾 Save Product</button> <button class="btn" onclick="clearProductForm()">＋ New Product</button></div>
+</div>
+<div class="admin-list" id="adminList"></div>
+
+<h3>Store details</h3>
+<div class="admin-grid">
+<div><label>Phone<input id="aPhone"></label></div>
+<div><label>WhatsApp number<input id="aWhatsApp" placeholder="919876543210"></label></div>
+<div><label>UPI ID<input id="aUpi" placeholder="yourname@upi"></label></div>
+<div><label>Business name<input id="aBusiness"></label></div>
+<div class="full"><button class="btn green" onclick="saveStore()">💾 Save Store Details</button></div>
+</div>
+
+<h3>Admin password</h3>
+<input id="newPassword" type="password" placeholder="Enter new admin password">
+<br><br><button class="btn orange" onclick="changePassword()">Change Password</button>
+<p style="font-size:13px;color:#777">Important: this password protects the editing screen in this browser. A truly secure online admin system requires a server/backend.</p>
+</div>
+</div></div>
+
+<script>
+const defaultProducts=[
+{name:"Dehydrated Mango",price:249,desc:"Sweet and delicious dehydrated mango slices.",emoji:"🥭",image:""},
+{name:"Banana Chips",price:179,desc:"Crispy dehydrated banana slices.",emoji:"🍌",image:""},
+{name:"Mixed Vegetable Pack",price:299,desc:"A colorful mix for cooking and snacking.",emoji:"🥕",image:""}
+];
+let products=JSON.parse(localStorage.getItem("ns_products_final")||"null")||defaultProducts;
+let cart=JSON.parse(localStorage.getItem("ns_cart_final")||"{}");
+let store=JSON.parse(localStorage.getItem("ns_store_final")||"null")||{phone:"",whatsapp:"",upi:"",business:"NutriShelf"};
+let adminPassword=localStorage.getItem("ns_admin_password")||"NutriShelf123";
+let editingIndex=-1, pendingImage="";
+
+const $=id=>document.getElementById(id);
+function esc(s){return String(s||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function saveProducts(){localStorage.setItem("ns_products_final",JSON.stringify(products))}
+function saveCart(){localStorage.setItem("ns_cart_final",JSON.stringify(cart))}
+function saveStoreData(){localStorage.setItem("ns_store_final",JSON.stringify(store))}
+
+function renderProducts(){
+$("products").innerHTML=products.map((p,i)=>`
+<article class="card">
+<div class="photo">${p.image?`<img src="${p.image}" alt="${esc(p.name)}">`:`<span>${esc(p.emoji||"🌿")}</span>`}</div>
+<div class="body"><h3>${esc(p.name)}</h3><p>${esc(p.desc)}</p>
+<div class="price">₹${Number(p.price).toLocaleString("en-IN")}</div>
+<button class="add-cart" onclick="addToCart(${i})">🛒 Add to Cart</button></div>
+</article>`).join("");
+}
+
+function addToCart(i){cart[i]=(cart[i]||0)+1;saveCart();renderCart();openCart()}
+function changeQty(i,d){cart[i]=(cart[i]||0)+d;if(cart[i]<=0)delete cart[i];saveCart();renderCart()}
+function renderCart(){
+let total=0,count=0,keys=Object.keys(cart);
+$("cartItems").innerHTML=keys.length?keys.map(i=>{let p=products[i],q=cart[i];total+=Number(p.price)*q;count+=q;return `<div class="cart-item"><div class="row"><b>${esc(p.name)}</b><b>₹${(Number(p.price)*q).toLocaleString("en-IN")}</b></div><div class="row" style="margin-top:8px"><span>₹${Number(p.price).toLocaleString("en-IN")} × ${q}</span><span class="qty"><button onclick="changeQty(${i},-1)">−</button> <button onclick="changeQty(${i},1)">+</button></span></div></div>`}).join(""):"<p>Your cart is empty.</p>";
+$("cartTotal").textContent=total.toLocaleString("en-IN");$("cartCount").textContent=count;$("callLink").href=store.phone?"tel:"+store.phone:"#";
+}
+function openCart(){$("cartPanel").classList.add("open");$("overlay").classList.add("show")}
+function closeCart(){$("cartPanel").classList.remove("open");$("overlay").classList.remove("show")}
+
+function orderMessage(){
+let keys=Object.keys(cart);if(!keys.length){alert("Your cart is empty.");return null}
+let total=0;let lines=keys.map(i=>{let p=products[i],q=cart[i];total+=Number(p.price)*q;return `${p.name} x ${q} = ₹${Number(p.price)*q}`}).join("\n");
+return `Hello ${store.business}, I would like to place an order:\n\n${lines}\n\nTotal: ₹${total}\nName: ${$("customerName").value||"Not provided"}\nPhone: ${$("customerPhone").value||"Not provided"}\nAddress: ${$("customerAddress").value||"Not provided"}`;
+}
+function whatsappOrder(){let msg=orderMessage();if(!msg)return;if(!store.whatsapp){alert("The store owner has not added a WhatsApp number yet.");return}window.open("https://wa.me/"+store.whatsapp+"?text="+encodeURIComponent(msg),"_blank")}
+function upiPay(){let keys=Object.keys(cart);if(!keys.length){alert("Your cart is empty.");return}if(!store.upi){alert("The store owner has not added a UPI ID yet.");return}let total=keys.reduce((s,i)=>s+Number(products[i].price)*cart[i],0);location.href=`upi://pay?pa=${encodeURIComponent(store.upi)}&pn=${encodeURIComponent(store.business)}&am=${total}&cu=INR&tn=NutriShelf%20order`}
+
+document.addEventListener("keydown",e=>{if(e.ctrlKey&&e.shiftKey&&e.key.toLowerCase()==="a"){e.preventDefault();openAdmin()}});
+
+function openAdmin(){$("adminOverlay").classList.add("show");$("adminPassword").value="";$("loginArea").style.display="block";$("adminArea").style.display="none"}
+function closeAdmin(){$("adminOverlay").classList.remove("show")}
+function loginAdmin(){if($("adminPassword").value===adminPassword){$("loginArea").style.display="none";$("adminArea").style.display="block";loadAdmin();}else alert("Incorrect admin password.")}
+function loadAdmin(){renderAdminList();$("aPhone").value=store.phone;$("aWhatsApp").value=store.whatsapp;$("aUpi").value=store.upi;$("aBusiness").value=store.business}
+function renderAdminList(){$("adminList").innerHTML=products.map((p,i)=>`<div class="admin-product"><span><b>${esc(p.name)}</b> — ₹${Number(p.price).toLocaleString("en-IN")}</span><span><button class="btn" onclick="editAdminProduct(${i})">✏️ Edit</button> <button class="btn" onclick="deleteAdminProduct(${i})">🗑 Delete</button></span></div>`).join("")}
+function editAdminProduct(i){editingIndex=i;let p=products[i];$("aName").value=p.name;$("aPrice").value=p.price;$("aDesc").value=p.desc;$("aEmoji").value=p.emoji||"🌿";pendingImage=p.image||"";$("aImage").value="";if(p.image){$("aPreview").src=p.image;$("aPreview").style.display="block"}else $("aPreview").style.display="none"}
+function clearProductForm(){editingIndex=-1;$("aName").value="";$("aPrice").value="";$("aDesc").value="";$("aEmoji").value="🌿";$("aImage").value="";pendingImage="";$("aPreview").style.display="none"}
+$("aImage").addEventListener("change",e=>{let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{pendingImage=r.result;$("aPreview").src=pendingImage;$("aPreview").style.display="block"};r.readAsDataURL(f)})
+function saveProduct(){let p={name:$("aName").value.trim(),price:Number($("aPrice").value),desc:$("aDesc").value.trim(),emoji:$("aEmoji").value.trim()||"🌿",image:pendingImage};if(!p.name||!p.price){alert("Please enter product name and price.");return}if(editingIndex<0)products.push(p);else products[editingIndex]=p;saveProducts();renderProducts();renderCart();renderAdminList();clearProductForm();alert("Product saved!")}
+function deleteAdminProduct(i){if(confirm("Delete "+products[i].name+"?")){delete cart[i];products.splice(i,1);let newCart={};Object.keys(cart).forEach(k=>{let n=Number(k);if(n>i)newCart[n-1]=cart[k];else if(n<i)newCart[n]=cart[k]});cart=newCart;saveProducts();saveCart();renderProducts();renderCart();renderAdminList()}}
+function saveStore(){store={phone:$("aPhone").value.trim(),whatsapp:$("aWhatsApp").value.trim(),upi:$("aUpi").value.trim(),business:$("aBusiness").value.trim()||"NutriShelf"};saveStoreData();renderCart();alert("Store details saved!")}
+function changePassword(){let p=$("newPassword").value;if(p.length<2){alert("Password must be at least 6 characters.");return}adminPassword=p;localStorage.setItem("ns_admin_password",p);$("newPassword").value="";alert("Admin password changed!")}
+
+renderProducts();renderCart();
+</script>
+</body>
+</html>
